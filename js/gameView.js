@@ -12,7 +12,7 @@ const visaoJogo = {
         console.log("Visão: Pré-carregando sons...");
         nomesDosSons.forEach(nome => {
             const audio = new Audio();
-            audio.src = `audio/${nome}.mp3`;
+            audio.src = `audio/${nome}.wav`;
             this.cacheDeAudio[nome] = audio;
         });
         console.log("Visão: Sons prontos!", this.cacheDeAudio);
