@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     function lidarComSelecaoDeCarta(indice) {
         console.log("CLIQUE DETETADO! Índice:", indice);
-        
+
         const resultado = modeloJogo.selecionarCarta(indice);
         
         if (resultado.status === 'bloqueado') {
@@ -30,12 +30,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             case 'par_encontrado':
                 visaoJogo.anunciarStatus(`É um par! ${resultado.nomeDoSom}.`);
-                visaoJogo.travarPar(modeloJogo.cartasViradas[0].indice, indice);
+                visaoJogo.travarPar(resultado.indiceCarta1, resultado.indiceCarta2);
                 break;
 
             case 'jogo_vencido':
                 visaoJogo.anunciarStatus(`Parabéns! Você encontrou todos os pares e venceu o jogo!`);
-                visaoJogo.travarPar(modeloJogo.cartasViradas[0].indice, indice);
+                visaoJogo.travarPar(resultado.indiceCarta1, resultado.indiceCarta2);
                 break;
 
             case 'nao_e_par':
