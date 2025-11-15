@@ -22,6 +22,8 @@ const visaoJogo = {
      * @param {string} nomeDoSom
      */
     tocarSom(nomeDoSom) {
+        console.log("VISÃO: Recebi ordem para tocar:", nomeDoSom);
+
         const audio = this.cacheDeAudio[nomeDoSom];
 
         if (audio) {

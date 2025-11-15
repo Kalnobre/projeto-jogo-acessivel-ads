@@ -13,6 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
      * @param {number} indice
      */
     function lidarComSelecaoDeCarta(indice) {
+        console.log("CLIQUE DETETADO! Índice:", indice);
+        
         const resultado = modeloJogo.selecionarCarta(indice);
         
         if (resultado.status === 'bloqueado') {
