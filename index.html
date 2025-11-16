@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Memória de Sons</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <header>
+        <h1>Jogo da Memória de Sons</h1>
+        <p class="instrucoes">
+            Use as <strong>teclas de seta</strong> para navegar no tabuleiro e
+            <strong>Enter</strong> ou <strong>Espaço</strong> para selecionar uma carta.
+        </p>
+    </header>
+
+    <main>
+        <div id="game-board" role="grid" aria-label="Tabuleiro do Jogo 4 por 4">
+            
+            <button role="gridcell" aria-label="Carta Posição 1,1"></button>
+            <button role="gridcell" aria-label="Carta Posição 1,2"></button>
+            <button role="gridcell" aria-label="Carta Posição 1,3"></button>
+            <button role="gridcell" aria-label="Carta Posição 1,4"></button>
+
+            <button role="gridcell" aria-label="Carta Posição 2,1"></button>
+            <button role="gridcell" aria-label="Carta Posição 2,2"></button>
+            <button role="gridcell" aria-label="Carta Posição 2,3"></button>
+            <button role="gridcell" aria-label="Carta Posição 2,4"></button>
+
+            <button role="gridcell" aria-label="Carta Posição 3,1"></button>
+            <button role="gridcell" aria-label="Carta Posição 3,2"></button>
+            <button role="gridcell" aria-label="Carta Posição 3,3"></button>
+            <button role="gridcell" aria-label="Carta Posição 3,4"></button>
+
+            <button role="gridcell" aria-label="Carta Posição 4,1"></button>
+            <button role="gridcell" aria-label="Carta Posição 4,2"></button>
+            <button role="gridcell" aria-label="Carta Posição 4,3"></button>
+            <button role="gridcell" aria-label="Carta Posição 4,4"></button>
+        </div>
+
+        <div id="game-status" class="visualmente-escondido" aria-live="polite">
+            </div>
+    </main>
+
+    <script src="js/modeloJogo.js" defer></script>
+    <script src="js/visaoJogo.js" defer></script>
+    <script src="js/main.js" defer></script>
+
+</body>
+</html>

@@ -1,0 +1,72 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #f0f4f8;
+    color: #333;
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 0 15px;
+    text-align: center;
+}
+
+.instrucoes {
+    font-size: 1.1em;
+    color: #555;
+}
+
+.visualmente-escondido {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+#game-board {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 100px);
+    gap: 12px;
+    margin-top: 25px;
+    border: 3px solid #b0c4de;
+    border-radius: 8px;
+    padding: 12px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+#game-board button {
+    width: 100%;
+    height: 100%;
+    font-size: 1.2em;
+    background-color: #e2e8f0;
+    border: 2px solid #cbd5e0;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s, outline 0.1s;
+}
+
+#game-board button:focus {
+    background-color: #bee3f8;
+    border-color: #4299e1;
+    outline: 3px solid #4299e1;
+    outline-offset: 2px;
+}
+
+#game-board button.carta-travada {
+    background-color: #fefcbf;
+    border-color: #f6e05e;
+}
+
+#game-board button.carta-par-encontrado {
+    background-color: #c6f6d5;
+    border-color: #68d391;
+    opacity: 0.7;
+}
+
+#game-board button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
