@@ -9,6 +9,51 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    visaoJogo.tabuleiro.addEventListener('keydown', (evento) => {
+        const celulaFocada = document.activeElement;
+        if (!celulaFocada || !celulaFocada.matches('[role="gridcell"]')) {
+            return;
+        }
+        const indiceAtual = Array.from(visaoJogo.botoes).indexOf(celulaFocada);
+
+        if (indiceAtual === -1) {
+            return;
+        }
+        const colunas = 4;
+        const totalCartas = visaoJogo.botoes.length;
+        let novoIndice = indiceAtual;
+
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(evento.key)) {
+            evento.preventDefault();
+        }
+
+        switch (evento.key) {
+            case 'ArrowLeft':
+                if (indiceAtual % colunas !== 0) {
+                    novoIndice = indiceAtual - 1;
+                }
+                break;
+            case 'ArrowRight':
+                if ((indiceAtual + 1) % colunas !== 0) {
+                    novoIndice = indiceAtual + 1;
+                }
+                break;
+            case 'ArrowUp':
+                if (indiceAtual >= colunas) {
+                    novoIndice = indiceAtual - colunas;
+                }
+                break;
+            case 'ArrowDown':
+                if (indiceAtual < totalCartas - colunas) {
+                    novoIndice = indiceAtual + colunas;
+                }
+                break;
+        }
+        if (novoIndice !== indiceAtual) {
+            visaoJogo.botoes[novoIndice].focus();
+        }
+    });
+
     /**
      * @param {number} indice
      */
