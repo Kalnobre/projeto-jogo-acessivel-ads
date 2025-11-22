@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     modeloJogo.criarTabuleiro(); 
     visaoJogo.preCarregarSons(modeloJogo.nomesDosSons);
 
-    vvisaoJogo.botoes.forEach((botao, indice) => {
+    visaoJogo.botoes.forEach((botao, indice) => {
         botao.addEventListener('click', () => {
             
             if (botao.getAttribute('aria-disabled') === 'true') {
