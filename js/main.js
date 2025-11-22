@@ -3,8 +3,13 @@ document.addEventListener('DOMContentLoaded', () => {
     modeloJogo.criarTabuleiro(); 
     visaoJogo.preCarregarSons(modeloJogo.nomesDosSons);
 
-    visaoJogo.botoes.forEach((botao, indice) => {
+    vvisaoJogo.botoes.forEach((botao, indice) => {
         botao.addEventListener('click', () => {
+            
+            if (botao.getAttribute('aria-disabled') === 'true') {
+                return;
+            }
+
             lidarComSelecaoDeCarta(indice);
         });
     });

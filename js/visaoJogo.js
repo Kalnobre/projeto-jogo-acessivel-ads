@@ -64,8 +64,8 @@ const visaoJogo = {
         botao1.classList.add('carta-par-encontrado');
         botao2.classList.add('carta-par-encontrado');
 
-        botao1.disabled = true;
-        botao2.disabled = true;
+        botao1.setAttribute('aria-disabled', 'true');
+        botao2.setAttribute('aria-disabled', 'true');
     },
 
     /**
