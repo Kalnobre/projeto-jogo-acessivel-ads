@@ -45,19 +45,15 @@ const visaoJogo = {
     /**
      * @param {number} indice
      */
-    travarCarta(indice, nomeDoSom = null) {
+    travarCarta(indice) {
         const botao = this.botoes[indice];
         botao.classList.add('carta-travada');
         
-        if (nomeDoSom) {
-             botao.setAttribute('aria-label', `${nomeDoSom} - Selecionado`);
-        }
+        const linha = Math.floor(indice / 4) + 1;
+        const coluna = (indice % 4) + 1;
+        botao.setAttribute('aria-label', `Carta Posição ${linha},${coluna} - Selecionada`);
     },
 
-    /**
-     * @param {number} indice1
-     * @param {number} indice2
-     */
     travarPar(indice1, indice2, nomeDoSom) {
         const botao1 = this.botoes[indice1];
         const botao2 = this.botoes[indice2];
@@ -76,17 +72,13 @@ const visaoJogo = {
         botao2.setAttribute('aria-label', textoAcessivel);
     },
 
-    /**
-     * @param {number} indice1
-     * @param {number} indice2
-     */
     desvirarCartas(indice1, indice2) {
         const botao1 = this.botoes[indice1];
         const botao2 = this.botoes[indice2];
 
         botao1.classList.remove('carta-travada');
         botao2.classList.remove('carta-travada');
-        
+
         const recuperarNomeOriginal = (ind) => {
             const linha = Math.floor(ind / 4) + 1;
             const coluna = (ind % 4) + 1;

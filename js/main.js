@@ -74,28 +74,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
         switch (resultado.status) {
             case 'aguardando_segunda_carta':
-                visaoJogo.anunciarStatus(`Você selecionou... ${resultado.nomeDoSom}.`);
-                visaoJogo.travarCarta(indice, resultado.nomeDoSom); 
+                visaoJogo.anunciarStatus(`Carta virada! Ouça o som...`); 
+                
+                visaoJogo.travarCarta(indice);
                 break;
 
             case 'par_encontrado':
-                visaoJogo.anunciarStatus(`É um par! ${resultado.nomeDoSom}.`);
+                visaoJogo.anunciarStatus(`É um par! É o som de ${resultado.nomeDoSom}.`);
+                
                 visaoJogo.travarPar(resultado.indiceCarta1, resultado.indiceCarta2, resultado.nomeDoSom);
                 break;
 
             case 'jogo_vencido':
-                visaoJogo.anunciarStatus(`Parabéns! ...`);
+                visaoJogo.anunciarStatus(`Parabéns! Você encontrou todos os pares!`);
                 visaoJogo.travarPar(resultado.indiceCarta1, resultado.indiceCarta2, resultado.nomeDoSom);
                 break;
 
-             case 'nao_e_par':
-                visaoJogo.anunciarStatus(`Não é um par...`);
-                visaoJogo.travarCarta(indice, resultado.nomeDoSom); 
+            case 'nao_e_par':
+                visaoJogo.anunciarStatus(`Não é um par. Ouça o som e tente memorizar.`);
+                
+                visaoJogo.travarCarta(indice);
 
                 setTimeout(() => {
                     visaoJogo.desvirarCartas(resultado.indiceCarta1, resultado.indiceCarta2);
                     modeloJogo.reiniciarJogada();
                 }, 2000); 
+                
                 break;
         }
     }
