@@ -1,72 +1,122 @@
-body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background-color: #f0f4f8;
-    color: #333;
-    max-width: 600px;
-    margin: 20px auto;
-    padding: 0 15px;
-    text-align: center;
+/* style.css — estilos simples e acessíveis */
+:root{
+  --bg:#eef4f7;
+  --card:#ffffff;
+  --accent:#2b9cff;
+  --text:#222;
 }
 
-.instrucoes {
-    font-size: 1.1em;
-    color: #555;
+*{box-sizing:border-box}
+body{
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:28px 12px;
 }
 
-.visualmente-escondido {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    margin: -1px;
-    padding: 0;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    border: 0;
+header h1{
+  border:4px solid var(--accent);
+  padding:8px 12px;
+  border-radius:4px;
+  text-align:center;
+  max-width:700px;
+  margin:0 0 12px 0;
 }
 
-#game-board {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(4, 100px);
-    gap: 12px;
-    margin-top: 25px;
-    border: 3px solid #b0c4de;
-    border-radius: 8px;
-    padding: 12px;
-    background-color: #ffffff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+.instrucoes{
+  margin:10px 0 14px 0;
+  max-width:700px;
+  text-align:center;
 }
 
-#game-board button {
-    width: 100%;
-    height: 100%;
-    font-size: 1.2em;
-    background-color: #e2e8f0;
-    border: 2px solid #cbd5e0;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.2s, border-color 0.2s, outline 0.1s;
+#menu-dificuldade{
+  margin-bottom:16px;
+  text-align:center;
+}
+.menu-list{ display:inline-flex; flex-direction:column; gap:8px; }
+.menu-btn{
+  padding:10px 16px;
+  font-size:18px;
+  border-radius:8px;
+  border:2px solid rgba(0,0,0,0.12);
+  background:white;
+  cursor:pointer;
+  min-width:260px;
+}
+.menu-btn[tabindex="0"], .menu-btn:focus{
+  outline:4px solid rgba(43,156,255,0.18);
+  border-color:var(--accent);
+  box-shadow:0 4px 10px rgba(0,0,0,0.06);
 }
 
-#game-board button:focus {
-    background-color: #bee3f8;
-    border-color: #4299e1;
-    outline: 3px solid #4299e1;
-    outline-offset: 2px;
+#area-jogo{ margin-top:8px; display:flex; flex-direction:column; align-items:center; width:100%; max-width:700px; }
+
+#game-board{
+  width:100%;
+  max-width:560px;
+  height:auto;
+  background:var(--card);
+  border-radius:8px;
+  padding:18px;
+  box-shadow:0 2px 0 rgba(0,0,0,0.05);
+  display:grid;
+  gap:12px;
+  grid-template-columns: repeat(4, 1fr); /* sempre 4 colunas */
+  justify-items:center;
+  align-items:center;
+  min-height:360px;
 }
 
-#game-board button.carta-travada {
-    background-color: #fefcbf;
-    border-color: #f6e05e;
+/* botão carta */
+.card {
+  width:100%;
+  aspect-ratio: 1 / 1;
+  max-width:110px;
+  background:linear-gradient(180deg,#fff,#fafafa);
+  border-radius:8px;
+  border:2px solid rgba(0,0,0,0.08);
+  cursor:pointer;
+  font-size:24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
-#game-board button.carta-par-encontrado {
-    background-color: #c6f6d5;
-    border-color: #68d391;
-    opacity: 0.7;
+.card:focus{
+  outline:4px solid rgba(43,156,255,0.18);
+  border-color:var(--accent);
 }
 
-#game-board button:disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
+.card.travada{
+  transform:scale(0.98);
+  opacity:0.9;
+}
+
+.card.par-encontrado{
+  opacity:0.6;
+  cursor:default;
+}
+
+/* visivelmente escondido (para leitores de tela) */
+.visually-hidden{
+  position:absolute !important;
+  left:-9999px;
+  width:1px;
+  height:1px;
+  overflow:hidden;
+}
+
+/* controles */
+.controls{
+  margin-top:12px;
+  display:flex;
+  gap:8px;
+}
+.controls button{
+  padding:8px 12px;
+  border-radius:6px;
 }
