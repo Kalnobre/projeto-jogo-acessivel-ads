@@ -1,95 +1,79 @@
-/* visaoJogo.js
-   Renderiza o tabuleiro, pré-carrega sons, toca som, atualiza estados visuais e anuncia status.
-*/
 
-const visaoJogo = (function(){
-  const boardEl = document.getElementById("game-board");
-  const statusEl = document.getElementById("game-status");
-  let botoes = []; // lista de elementos .card
-  const cacheAudio = {};
+const visaoJogo = {
+    tabuleiro: document.getElementById('game-board'),
+    statusAnuncio: document.getElementById('game-status'),
+    botoes: document.querySelectorAll('[role="gridcell"]'),
+    cacheDeAudio: {},
 
-  function preCarregarSons(nomes){
-    // carrega e guarda instâncias de áudio
-    nomes.forEach(nome => {
-      try {
-        const a = new Audio(`audio/${nome}.wav`);
-        cacheAudio[nome] = a;
-      } catch(e){}
-    });
-  }
+    /**
+     * @param {string[]} nomesDosSons
+     */
+    preCarregarSons(nomesDosSons) {
+        console.log("Visão: Pré-carregando sons...");
+        nomesDosSons.forEach(nome => {
+            const audio = new Audio();
+            audio.src = `audio/${nome}.wav`;
+            this.cacheDeAudio[nome] = audio;
+        });
+        console.log("Visão: Sons prontos!", this.cacheDeAudio);
+    },
 
-  function tocarSom(nome){
-    const audio = cacheAudio[nome] || new Audio(`audio/${nome}.wav`);
-    try {
-      audio.currentTime = 0;
-      audio.play().catch(err => {
-        // falha de autoplay talvez — ignore silenciosamente
-        console.warn("Erro ao tocar áudio:", err);
-      });
-    } catch(e){
-      console.warn("Erro tocando som:", e);
+    /**
+     * @param {string} nomeDoSom
+     */
+    tocarSom(nomeDoSom) {
+        console.log("VISÃO: Recebi ordem para tocar:", nomeDoSom);
+
+        const audio = this.cacheDeAudio[nomeDoSom];
+
+        if (audio) {
+            audio.currentTime = 0; 
+            audio.play().catch(e => console.error("Erro ao tocar áudio:", e));
+        } else {
+            console.warn(`Visão: Som "${nomeDoSom}" não encontrado no cache!`);
+        }
+    },
+
+    /**
+     * @param {string} mensagem
+     */
+    anunciarStatus(mensagem) {
+        this.statusAnuncio.textContent = mensagem;
+        console.log("Anúncio:", mensagem);
+    },
+
+    /**
+     * @param {number} indice
+     */
+    travarCarta(indice) {
+        const botao = this.botoes[indice];
+        botao.classList.add('carta-travada');
+    },
+
+    /**
+     * @param {number} indice1
+     * @param {number} indice2
+     */
+    travarPar(indice1, indice2) {
+        const botao1 = this.botoes[indice1];
+        const botao2 = this.botoes[indice2];
+
+        botao1.classList.remove('carta-travada');
+        botao2.classList.remove('carta-travada');
+        
+        botao1.classList.add('carta-par-encontrado');
+        botao2.classList.add('carta-par-encontrado');
+
+        botao1.disabled = true;
+        botao2.disabled = true;
+    },
+
+    /**
+     * @param {number} indice1
+     * @param {number} indice2
+     */
+    desvirarCartas(indice1, indice2) {
+        this.botoes[indice1].classList.remove('carta-travada');
+        this.botoes[indice2].classList.remove('carta-travada');
     }
-  }
-
-  function anunciarStatus(msg){
-    if(statusEl) {
-      statusEl.textContent = msg;
-    }
-    console.log("ANUNCIO:", msg);
-  }
-
-  function montarCartas(totalCartas){
-    boardEl.innerHTML = "";
-    botoes = [];
-    for(let i=0;i<totalCartas;i++){
-      const btn = document.createElement("button");
-      btn.className = "card";
-      btn.setAttribute("role","gridcell");
-      btn.setAttribute("aria-label", `Carta ${i+1}`);
-      btn.tabIndex = -1; // foco controlado
-      btn.textContent = "?";
-      boardEl.appendChild(btn);
-      botoes.push(btn);
-    }
-    // define primeiro focável
-    if (botoes.length) botoes[0].tabIndex = 0;
-    return botoes;
-  }
-
-  function atualizarReferencias(){
-    // atualizar botoes caso necessidade
-    // no nosso uso, montarCartas já atualiza botoes
-  }
-
-  function travarCarta(indice){
-    const b = botoes[indice];
-    if (b) b.classList.add("travada");
-  }
-
-  function travarPar(i1,i2){
-    const a = botoes[i1], b = botoes[i2];
-    if (a && b){
-      a.classList.add("par-encontrado");
-      b.classList.add("par-encontrado");
-      a.disabled = true; b.disabled = true;
-      a.classList.remove("travada"); b.classList.remove("travada");
-    }
-  }
-
-  function desvirarCartas(i1,i2){
-    const a = botoes[i1], b = botoes[i2];
-    if (a) a.classList.remove("travada");
-    if (b) b.classList.remove("travada");
-  }
-
-  return {
-    preCarregarSons,
-    tocarSom,
-    anunciarStatus,
-    montarCartas,
-    travarCarta,
-    travarPar,
-    desvirarCartas,
-    get botoes(){ return botoes; }
-  };
-})();
+};
