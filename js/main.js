@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     document.getElementById('btn-creditos').addEventListener('click', () => {
-        mostrarModal("Créditos", "Desenvolvido por: [Seu Nome] e Equipe. Projeto de ADS - 4º Período.");
+        mostrarModal("Créditos", "Desenvolvido por: Kalebe Nobre e João Victor. Projeto de ADS - 4º Período.");
     });
 
     document.getElementById('btn-fechar-modal').addEventListener('click', () => {
