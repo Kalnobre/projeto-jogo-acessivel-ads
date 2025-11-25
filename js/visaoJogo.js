@@ -5,9 +5,6 @@ const visaoJogo = {
     botoes: document.querySelectorAll('[role="gridcell"]'),
     cacheDeAudio: {},
 
-    /**
-     * @param {string[]} nomesDosSons
-     */
     preCarregarSons(nomesDosSons) {
         console.log("Visão: Pré-carregando sons...");
         nomesDosSons.forEach(nome => {
@@ -18,9 +15,6 @@ const visaoJogo = {
         console.log("Visão: Sons prontos!", this.cacheDeAudio);
     },
 
-    /**
-     * @param {string} nomeDoSom
-     */
     tocarSom(nomeDoSom) {
         console.log("VISÃO: Recebi ordem para tocar:", nomeDoSom);
 
@@ -34,17 +28,11 @@ const visaoJogo = {
         }
     },
 
-    /**
-     * @param {string} mensagem
-     */
     anunciarStatus(mensagem) {
         this.statusAnuncio.textContent = mensagem;
         console.log("Anúncio:", mensagem);
     },
 
-    /**
-     * @param {number} indice
-     */
     travarCarta(indice) {
         const botao = this.botoes[indice];
         botao.classList.add('carta-travada');
@@ -87,5 +75,13 @@ const visaoJogo = {
 
         botao1.setAttribute('aria-label', recuperarNomeOriginal(indice1));
         botao2.setAttribute('aria-label', recuperarNomeOriginal(indice2));
-    }
+    },
+
+    inicializarCartas() {
+        this.botoes.forEach((botao, index) => {
+            const linha = Math.floor(index / 4) + 1;
+            const coluna = (index % 4) + 1;
+            botao.setAttribute('aria-label', `Carta Posição ${linha},${coluna}`);
+        });
+    },
 };

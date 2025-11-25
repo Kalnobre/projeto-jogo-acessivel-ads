@@ -1,6 +1,7 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     modeloJogo.criarTabuleiro(); 
+    visaoJogo.inicializarCartas();
     visaoJogo.preCarregarSons(modeloJogo.nomesDosSons);
 
     visaoJogo.botoes.forEach((botao, indice) => {
