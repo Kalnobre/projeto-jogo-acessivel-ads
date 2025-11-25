@@ -2,204 +2,325 @@
 
 (function(){
 
-  const menu = document.getElementById("menu-dificuldade");
-  const menuBtns = Array.from(document.querySelectorAll(".menu-btn"));
-  const menuAnnouncer = document.getElementById("menu-announcer");
-  const areaJogo = document.getElementById("area-jogo");
-  const btnReiniciar = document.getElementById("btn-reiniciar");
-  const btnVoltar = document.getElementById("btn-voltar-menu");
-  const gameStatus = document.getElementById("game-status");
+  const menu = document.getElementById("menu-dificuldade");
+  const menuBtns = Array.from(document.querySelectorAll(".menu-btn"));
+  const menuAnnouncer = document.getElementById("menu-announcer");
+  const areaJogo = document.getElementById("area-jogo");
+  const btnReiniciar = document.getElementById("btn-reiniciar");
+  const btnVoltar = document.getElementById("btn-voltar-menu");
+  const gameStatus = document.getElementById("game-status");
+  
+  // DEFINIÇÕES DE JOGO
+  const COLUNAS_FIXAS = 4; 
+  // **IMPORTANTE: Ajuste este valor (em milissegundos) para a duração real dos sons dos seus animais.**
+  const DURACAO_SOM_ANIMAL = 1500; 
+  
+  // Flag para controlar o anúncio de posição após o foco programático (acerto)
+  let silenciarProximoAnuncioDeFoco = false; 
 
-  // --- menu: navegação por setas e announcer ---
-  let menuIndex = 0;
-  function announceMenu(msg){ if(menuAnnouncer) menuAnnouncer.textContent = msg; }
+  /* -------------------------------
+     FUNÇÕES DE ANÚNCIO E MAPA
+  --------------------------------*/
+  function announceMenu(msg){
+    if(menuAnnouncer) menuAnnouncer.textContent = msg;
+  }
+  
+  // Mapeia o índice do array para a posição da matriz (1A, 1B, 2A...)
+  function indiceParaPosicao(indice, colunas) {
+    const linha = Math.floor(indice / colunas) + 1;
+    const coluna = String.fromCharCode(65 + (indice % colunas)); 
+    return `${linha}${coluna}`;
+  }
 
-  // foco inicial no primeiro botão
-  window.addEventListener("load", () => {
-    if (menuBtns.length) {
-      menuBtns.forEach((b,i)=> b.tabIndex = i===0 ? 0 : -1);
-      menuBtns[0].focus();
-      announceMenu(`Dificuldade ${menuBtns[0].dataset.nome}`);
-    }
-  });
+  /* -------------------------------
+     MENU ACESSÍVEL
+  --------------------------------*/
+  let menuIndex = 0;
 
-  menuBtns.forEach((btn, i) => {
-    btn.addEventListener("focus", () => {
-      menuBtns.forEach((b,idx)=> b.tabIndex = idx===i ? 0 : -1);
-      menuIndex = i;
-      announceMenu(`Dificuldade ${btn.dataset.nome}`);
-    });
-    btn.addEventListener("mouseenter", () => announceMenu(`Dificuldade ${btn.dataset.nome}`));
-    btn.addEventListener("click", () => selecionarDificuldade(btn));
-    // permitir Enter/Space selecionar
-    btn.addEventListener("keydown", (e)=>{
-      if(e.key === "Enter" || e.key === " "){
-        e.preventDefault();
-        selecionarDificuldade(btn);
-      }
-    });
-  });
+  window.addEventListener("load", () => {
+    if (menuBtns.length) {
+      menuBtns.forEach((b,i)=> b.tabIndex = i===0 ? 0 : -1);
+      menuBtns[0].focus();
+      announceMenuComTamanho(menuBtns[0]);
+    }
+  });
+  
+  function announceMenuComTamanho(btn) {
+    const pares = Number(btn.dataset.pares) || 4;
+    const nome = btn.dataset.nome || "Modo";
+    const totalCartas = pares * 2;
+    const linhas = totalCartas / COLUNAS_FIXAS;
+    
+    // OTIMIZAÇÃO: Dividir em dois anúncios rápidos para evitar a pausa no menu.
+    announceMenu(`Dificuldade ${nome}.`);
+    
+    setTimeout(() => {
+      announceMenu(`Tabuleiro de ${linhas} por ${COLUNAS_FIXAS}.`);
+    }, 300); // 300ms: Atraso mínimo para garantir que a 1ª mensagem seja iniciada.
+  }
 
-  document.addEventListener("keydown", (e) => {
-    if (!areaJogo.hidden) return; // se já está no jogo, não mexe no menu
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      menuIndex = (menuIndex + 1) % menuBtns.length;
-      menuBtns[menuIndex].focus();
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      menuIndex = (menuIndex - 1 + menuBtns.length) % menuBtns.length;
-      menuBtns[menuIndex].focus();
-    }
-  });
+  menuBtns.forEach((btn, i) => {
+    btn.addEventListener("focus", () => {
+      menuBtns.forEach((b,idx)=> b.tabIndex = idx===i ? 0 : -1);
+      menuIndex = i;
+      announceMenuComTamanho(btn);
+    });
 
-  // --- selecionar dificuldade e iniciar ---
-  function selecionarDificuldade(btn){
-    const pares = Number(btn.dataset.pares) || 4;
-    const nome = btn.dataset.nome || "Modo";
+    btn.addEventListener("mouseenter",
+      () => announceMenuComTamanho(btn)
+    );
 
-    announceMenu(`Dificuldade selecionada: ${nome}`);
-    iniciarJogo(pares);
-  }
+    btn.addEventListener("click", () => selecionarDificuldade(btn));
 
-  // --- iniciar jogo: criar tabuleiro, pré-carregar sons, montar cartas e ligar controles ---
-  function iniciarJogo(pares){
-    // esconde menu, mostra jogo
-    menu.hidden = true;
-    areaJogo.hidden = false;
+    btn.addEventListener("keydown", (e) => {
+      if(e.key === "Enter" || e.key === " "){
+        e.preventDefault();
+        selecionarDificuldade(btn);
+      }
+    });
+  });
 
-    // criar tabuleiro no modelo
-    const nomes = modeloJogo.criarTabuleiro(pares); // modeloJogo.criarTabuleiro retorna array de nomes
-    // OBS: no nosso modeloJogo, criarTabuleiro não retorna nomes; ele atualiza internamente.
-    // Para usar os sons, pegaremos via modeloJogo (nomes disponíveis) — no código acima modeloJogo expõe get nomesDosSons? etc.
-    // para simplicidade, chamamos visaoJogo.preCarregarSons com os nomes atuais do modelo:
-    if (typeof modeloJogo.nomesDosSons !== "undefined") {
-      visaoJogo.preCarregarSons(modeloJogo.nomesDosSons);
-    } else if (typeof modeloJogo.getNames === "function") {
-      visaoJogo.preCarregarSons(modeloJogo.getNames());
-    } else {
-      // fallback: pre-carrega todos (caso modeloJogo nao expõe)
-      visaoJogo.preCarregarSons(["cachorro","cavalo","gato","ovelha","passaro","porco","sapo","vaca"]);
-    }
+  document.addEventListener("keydown", (e) => {
+    if (!areaJogo.hidden) return;
 
-    // montar botões (pares*2)
-    const totalCartas = (typeof modeloJogo.totalDePares === "number" ? modeloJogo.totalDePares : pares) * 2;
-    visaoJogo.montarCartas(totalCartas);
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      menuIndex = (menuIndex + 1) % menuBtns.length;
+      menuBtns[menuIndex].focus();
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      menuIndex = (menuIndex - 1 + menuBtns.length) % menuBtns.length;
+      menuBtns[menuIndex].focus();
+    }
+  });
 
-    // ligar eventos de controle no tabuleiro
-    ligarControlesTabuleiro();
-    visaoJogo.anunciarStatus("Jogo iniciado. Navegue pelas cartas com as setas e pressione Enter para ouvir.");
-  }
+  /* -------------------------------
+     INICIAR JOGO
+  --------------------------------*/
+  function selecionarDificuldade(btn){
+    const pares = Number(btn.dataset.pares) || 4;
+    const nome = btn.dataset.nome || "Modo";
 
-  // --- lógica de seleção já delegada ao modelo/visão ---
-  function lidarComSelecao(indice) {
-    const resultado = modeloJogo.selecionarCarta(indice);
+    announceMenu(`Dificuldade selecionada: ${nome}`);
+    iniciarJogo(pares);
+  }
 
-    if (resultado.status === "bloqueado") return;
+  function iniciarJogo(pares){
+    menu.hidden = true;
+    areaJogo.hidden = false;
 
-    if (resultado.nomeDoSom) visaoJogo.tocarSom(resultado.nomeDoSom);
+    modeloJogo.criarTabuleiro(pares);
 
-    switch (resultado.status) {
-      case "aguardando_segunda_carta":
-        visaoJogo.travarCarta(indice);
-        visaoJogo.anunciarStatus(`Carta selecionada.`);
-        break;
+    visaoJogo.preCarregarSons(modeloJogo.nomesDosSons);
 
-      case "par_encontrado":
-        visaoJogo.travarPar(resultado.indiceCarta1, resultado.indiceCarta2);
-        visaoJogo.anunciarStatus(`Par encontrado: ${resultado.nomeDoSom}`);
-        break;
+    const totalCartas = modeloJogo.totalDePares * 2;
+    visaoJogo.montarCartas(totalCartas);
 
-      case "jogo_vencido":
-        visaoJogo.travarPar(resultado.indiceCarta1, resultado.indiceCarta2);
-        visaoJogo.anunciarStatus("Parabéns! Você encontrou todos os pares.");
-        break;
+    ligarControlesTabuleiro();
+    
+    // Anúncio de matriz e esquema de navegação
+    const linhas = totalCartas / COLUNAS_FIXAS;
+    const primeiraPosicao = indiceParaPosicao(0, COLUNAS_FIXAS);
+    
+    // 1. Anuncia o início e o tamanho da matriz imediatamente (Prioridade).
+    visaoJogo.anunciarStatus(
+      `Jogo iniciado. É uma matriz de ${linhas} linhas por ${COLUNAS_FIXAS} colunas.`
+    );
+    
+    // 2. Anuncia as instruções de navegação com um atraso suficiente (1500ms).
+    setTimeout(() => {
+      visaoJogo.anunciarStatus(
+        `As letras significam as colunas e os números, as linhas. Posição atual ${primeiraPosicao}. Navegue com as setas e pressione Enter para ouvir.`
+      );
+    }, 1500); 
+  }
 
-      case "nao_e_par":
-        visaoJogo.travarCarta(indice);
-        visaoJogo.anunciarStatus("Não é par. Aguarde.");
-        setTimeout(() => {
-          visaoJogo.desvirarCartas(resultado.indiceCarta1, resultado.indiceCarta2);
-          modeloJogo.reiniciarJogada();
-          visaoJogo.anunciarStatus("Tente novamente.");
-        }, 1200);
-        break;
-    }
-  }
+  /* -------------------------------
+     SELEÇÃO DE CARTAS - FEEDBACK AJUSTADO
+  --------------------------------*/
+  function lidarComSelecao(indice){
+    const resultado = modeloJogo.selecionarCarta(indice);
 
-  // --- controle do teclado no tabuleiro (navegação 4 colunas) ---
-  function ligarControlesTabuleiro(){
-    const botoes = visaoJogo.botoes;
-    if (!botoes || botoes.length === 0) return;
+    if (resultado.status === "bloqueado") return;
 
-    // função para atualizar tabindex e focar
-    function setFocus(ind){
-      botoes.forEach((b,i)=> b.tabIndex = i===ind ? 0 : -1);
-      botoes[ind].focus();
-    }
+    if (resultado.nomeDoSom)
+      visaoJogo.tocarSom(resultado.nomeDoSom);
 
-    // iniciar foco no primeiro
-    setFocus(0);
+    switch(resultado.status){
 
-    // adicionar listeners
-    botoes.forEach((botao, indice) => {
-      // clique com mouse
-      botao.addEventListener("click", () => {
-        lidarComSelecao(indice);
-      });
+      case "aguardando_segunda_carta":
+        visaoJogo.travarCarta(indice);
+        
+        // Espera o som do animal tocar antes de anunciar a seleção.
+        setTimeout(() => {
+          visaoJogo.anunciarStatus("Carta selecionada.");
+        }, DURACAO_SOM_ANIMAL);
+        
+        break;
 
-      // keydown nos botões
-      botao.addEventListener("keydown", (e) => {
-        const colunas = 4;
-        const total = botoes.length;
-        let novo;
+      case "par_encontrado":
+        visaoJogo.travarPar(resultado.indiceCarta1, resultado.indiceCarta2);
+        
+        // 1. Espera o som tocar + BUFFER DE 1 SEGUNDO
+        setTimeout(() => {
+          // HACK: Limpa o anúncio com um valor vazio para tentar resetar o leitor de tela (Solução para o título)
+          visaoJogo.anunciarStatus(""); 
+          
+          // Micro-delay para garantir que a limpeza da região ocorra
+          setTimeout(() => {
+            // Anúncio forte, completo e final 
+            visaoJogo.anunciarStatus(`Par encontrado: ${resultado.nomeDoSom}.`);
+          
+            // 2. Atraso forte (3500ms) para garantir que a frase completa seja lida
+            setTimeout(() => {
+                // Move focus and announce position
+                silenciarProximoAnuncioDeFoco = true; 
+                focarProximaCartaValida(resultado.indiceCarta2);
+              
+                const botoes = visaoJogo.botoes;
+                const cartaFocada = botoes.findIndex(b => b === document.activeElement);
+                if (cartaFocada !== -1) {
+                    const posicao = indiceParaPosicao(cartaFocada, COLUNAS_FIXAS);
+                    // MENSAGEM FINAL: Encorajamento e nova posição.
+                    visaoJogo.anunciarStatus(`Continue jogando. Posição atual: ${posicao}`); 
+                }
+            }, 3500);
+          }, 10); // Micro-delay (10ms) para limpar
+          
+        }, DURACAO_SOM_ANIMAL + 1000); // DURACAO_SOM_ANIMAL (1500) + 1000ms de Buffer = 2500ms total
+        
+        break;
 
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          lidarComSelecao(indice);
-          return;
-        }
-        if (e.key === "ArrowRight") {
-          e.preventDefault();
-          novo = (indice + 1) % total;
-          setFocus(novo);
-        } else if (e.key === "ArrowLeft") {
-          e.preventDefault();
-          novo = (indice - 1 + total) % total;
-          setFocus(novo);
-        } else if (e.key === "ArrowDown") {
-          e.preventDefault();
-          novo = indice + colunas;
-          if (novo >= total) novo = novo % total;
-          setFocus(novo);
-        } else if (e.key === "ArrowUp") {
-          e.preventDefault();
-          novo = indice - colunas;
-          if (novo < 0) {
-            // calcula última linha na mesma coluna
-            const coluna = indice % colunas;
-            const ultimaLinhaInicio = Math.floor((total - 1) / colunas) * colunas;
-            novo = ultimaLinhaInicio + coluna;
-            if (novo >= total) novo -= colunas;
-          }
-          setFocus(novo);
-        }
-      });
+      case "jogo_vencido":
+        visaoJogo.travarPar(resultado.indiceCarta1, resultado.indiceCarta2);
+        visaoJogo.anunciarStatus("Parabéns! Você encontrou todos os pares.");
+        break;
 
-      // foco via mouse/tab atualiza tabindex
-      botao.addEventListener("focus", () => {
-        botoes.forEach((b,i)=> b.tabIndex = i===indice ? 0 : -1);
-      });
-    });
-  }
+      case "nao_e_par":
+        visaoJogo.travarCarta(indice);
+        
+        // OTIMIZAÇÃO: Atraso mínimo para feedback de erro (1650ms).
+        setTimeout(() => {
+          visaoJogo.desvirarCartas(resultado.indiceCarta1, resultado.indiceCarta2);
+          modeloJogo.reiniciarJogada();
+          
+          // Mensagem combinada e elegante + Posição atual
+          const posicao = indiceParaPosicao(indice, COLUNAS_FIXAS);
+          visaoJogo.anunciarStatus(`Par incorreto. Tente novamente. Posição atual: ${posicao}`);
+          
+        }, 1650); 
+        
+        break;
+    }
+  }
 
-  // --- reiniciar e voltar ao menu ---
-  const btnVoltarMenu = document.getElementById("btn-voltar-menu");
-  if (btnVoltarMenu) btnVoltarMenu.addEventListener("click", () => {
-    areaJogo.hidden = true;
-    menu.hidden = false;
-    // voltar foco para o menu
-    menuBtns[0].focus();
-  });
+  /* -------------------------------------------------------
+     FOCO INTELIGENTE 
+  --------------------------------------------------------*/
+  function focarProximaCartaValida(indiceAtual){
+    const botoes = visaoJogo.botoes;
+    const total = botoes.length;
+
+    for (let i = 1; i <= total; i++){
+      const idx = (indiceAtual + i) % total;
+      const b = botoes[idx];
+
+      if (!b.classList.contains("par-encontrado"))
+      {
+        botoes.forEach((x,j)=> x.tabIndex = j===idx ? 0 : -1);
+        b.focus();
+        return;
+      }
+    }
+  }
+
+  /* -------------------------------------------------------
+     CONTROLES DO TABULEIRO
+  --------------------------------------------------------*/
+  function ligarControlesTabuleiro(){
+    const botoes = visaoJogo.botoes;
+    if (!botoes.length) return;
+
+    const colunas = COLUNAS_FIXAS;
+
+    function proximoValido(indice, delta){
+      const total = botoes.length;
+
+      for (let i = 1; i <= total; i++){
+        const novo = (indice + delta * i + total) % total;
+        if (!botoes[novo].classList.contains("par-encontrado"))
+          return novo;
+      }
+      return indice;
+    }
+
+    function setFocus(i){
+      botoes.forEach((b,idx)=> b.tabIndex = idx===i ? 0 : -1);
+      botoes[i].focus();
+    }
+
+    setFocus(0);
+
+    botoes.forEach((botao, indice) => {
+
+      botao.addEventListener("click", () => {
+        lidarComSelecao(indice);
+      });
+
+      botao.addEventListener("keydown", (e) => {
+        let novo;
+
+        if (e.key === "Enter" || e.key === " "){
+          e.preventDefault();
+          lidarComSelecao(indice);
+          return;
+        }
+
+        if (e.key === "ArrowRight"){
+          e.preventDefault();
+          novo = proximoValido(indice, +1);
+          setFocus(novo);
+
+        } else if (e.key === "ArrowLeft"){
+          e.preventDefault();
+          novo = proximoValido(indice, -1);
+          setFocus(novo);
+
+        } else if (e.key === "ArrowDown"){
+          e.preventDefault();
+          novo = proximoValido(indice, colunas);
+          setFocus(novo);
+
+        } else if (e.key === "ArrowUp"){
+          e.preventDefault();
+          novo = proximoValido(indice, -colunas);
+          setFocus(novo);
+        }
+      });
+
+      botao.addEventListener("focus", () => {
+        
+        if (!silenciarProximoAnuncioDeFoco) {
+          // ANÚNCIO PADRÃO: Dispara durante a navegação manual (setas)
+          const posicao = indiceParaPosicao(indice, colunas);
+          visaoJogo.anunciarStatus(`Posição atual: ${posicao}`);
+        } else {
+          // ZERA O SILENCIAMENTO: Reseta a flag APÓS o foco programático
+          silenciarProximoAnuncioDeFoco = false;
+        }
+        
+        botoes.forEach((b,i)=> b.tabIndex = i===indice ? 0 : -1);
+      });
+    });
+  }
+
+  /* -------------------------------
+     VOLTAR AO MENU
+  --------------------------------*/
+  if (btnVoltar) btnVoltar.addEventListener("click", () => {
+    areaJogo.hidden = true;
+    menu.hidden = false;
+    menuBtns[0].focus();
+  });
 
 })();
