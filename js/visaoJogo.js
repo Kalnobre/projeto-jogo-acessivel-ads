@@ -5,9 +5,6 @@ const visaoJogo = {
     botoes: document.querySelectorAll('[role="gridcell"]'),
     cacheDeAudio: {},
 
-    /**
-     * @param {string[]} nomesDosSons
-     */
     preCarregarSons(nomesDosSons) {
         console.log("Visão: Pré-carregando sons...");
         nomesDosSons.forEach(nome => {
@@ -18,9 +15,6 @@ const visaoJogo = {
         console.log("Visão: Sons prontos!", this.cacheDeAudio);
     },
 
-    /**
-     * @param {string} nomeDoSom
-     */
     tocarSom(nomeDoSom) {
         console.log("VISÃO: Recebi ordem para tocar:", nomeDoSom);
 
@@ -34,27 +28,21 @@ const visaoJogo = {
         }
     },
 
-    /**
-     * @param {string} mensagem
-     */
     anunciarStatus(mensagem) {
         this.statusAnuncio.textContent = mensagem;
         console.log("Anúncio:", mensagem);
     },
 
-    /**
-     * @param {number} indice
-     */
     travarCarta(indice) {
         const botao = this.botoes[indice];
         botao.classList.add('carta-travada');
+        
+        const linha = Math.floor(indice / 4) + 1;
+        const coluna = (indice % 4) + 1;
+        botao.setAttribute('aria-label', `Carta Posição ${linha},${coluna} - Selecionada`);
     },
 
-    /**
-     * @param {number} indice1
-     * @param {number} indice2
-     */
-    travarPar(indice1, indice2) {
+    travarPar(indice1, indice2, nomeDoSom) {
         const botao1 = this.botoes[indice1];
         const botao2 = this.botoes[indice2];
 
@@ -64,16 +52,36 @@ const visaoJogo = {
         botao1.classList.add('carta-par-encontrado');
         botao2.classList.add('carta-par-encontrado');
 
-        botao1.disabled = true;
-        botao2.disabled = true;
+        botao1.setAttribute('aria-disabled', 'true');
+        botao2.setAttribute('aria-disabled', 'true');
+
+        const textoAcessivel = `${nomeDoSom} - Par encontrado`;
+        botao1.setAttribute('aria-label', textoAcessivel);
+        botao2.setAttribute('aria-label', textoAcessivel);
     },
 
-    /**
-     * @param {number} indice1
-     * @param {number} indice2
-     */
     desvirarCartas(indice1, indice2) {
-        this.botoes[indice1].classList.remove('carta-travada');
-        this.botoes[indice2].classList.remove('carta-travada');
-    }
+        const botao1 = this.botoes[indice1];
+        const botao2 = this.botoes[indice2];
+
+        botao1.classList.remove('carta-travada');
+        botao2.classList.remove('carta-travada');
+
+        const recuperarNomeOriginal = (ind) => {
+            const linha = Math.floor(ind / 4) + 1;
+            const coluna = (ind % 4) + 1;
+            return `Carta Posição ${linha},${coluna}`;
+        };
+
+        botao1.setAttribute('aria-label', recuperarNomeOriginal(indice1));
+        botao2.setAttribute('aria-label', recuperarNomeOriginal(indice2));
+    },
+
+    inicializarCartas() {
+        this.botoes.forEach((botao, index) => {
+            const linha = Math.floor(index / 4) + 1;
+            const coluna = (index % 4) + 1;
+            botao.setAttribute('aria-label', `Carta Posição ${linha},${coluna}`);
+        });
+    },
 };
