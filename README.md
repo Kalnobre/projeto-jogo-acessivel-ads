@@ -5,7 +5,7 @@ Projeto da disciplina de Fundamentos de Programação Web (4º Período ADS), fo
 ## 👥 Integrantes do Grupo
 * Kalebe Nobre de Aquino
 * Aline Pereira dos Santos
-* João
+* João Victor Oliveira Mendonça
 
 ## 🎯 Objetivo
 Demonstrar a aplicação de HTML semântico, atributos ARIA e manipulação de áudio com JavaScript para criar uma experiência de usuário inclusiva, seguindo as melhores práticas de desenvolvimento web.
