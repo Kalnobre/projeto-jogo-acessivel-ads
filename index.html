@@ -3,50 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jogo da Memória de Sons</title>
+    <title>Jogo da Memória Sonoro</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="data:,">
 </head>
 <body>
 
     <header>
-        <h1>Jogo da Memória de Sons</h1>
-        <p class="instrucoes">
-            Use as <strong>teclas de seta</strong> para navegar no tabuleiro e
-            <strong>Enter</strong> ou <strong>Espaço</strong> para selecionar uma carta.
-        </p>
+        <h1>Jogo da Memória Sonoro</h1>
     </header>
 
     <main>
-        <div id="game-board" role="grid" aria-label="Tabuleiro do Jogo 4 por 4">
-            
-            <button role="gridcell" aria-label="Carta Posição 1,1"></button>
-            <button role="gridcell" aria-label="Carta Posição 1,2"></button>
-            <button role="gridcell" aria-label="Carta Posição 1,3"></button>
-            <button role="gridcell" aria-label="Carta Posição 1,4"></button>
-
-            <button role="gridcell" aria-label="Carta Posição 2,1"></button>
-            <button role="gridcell" aria-label="Carta Posição 2,2"></button>
-            <button role="gridcell" aria-label="Carta Posição 2,3"></button>
-            <button role="gridcell" aria-label="Carta Posição 2,4"></button>
-
-            <button role="gridcell" aria-label="Carta Posição 3,1"></button>
-            <button role="gridcell" aria-label="Carta Posição 3,2"></button>
-            <button role="gridcell" aria-label="Carta Posição 3,3"></button>
-            <button role="gridcell" aria-label="Carta Posição 3,4"></button>
-
-            <button role="gridcell" aria-label="Carta Posição 4,1"></button>
-            <button role="gridcell" aria-label="Carta Posição 4,2"></button>
-            <button role="gridcell" aria-label="Carta Posição 4,3"></button>
-            <button role="gridcell" aria-label="Carta Posição 4,4"></button>
+        <div id="tela-menu" class="tela">
+            <h2 class="titulo-tela">Menu Principal</h2>
+            <nav class="menu-opcoes">
+                <h3>Novo Jogo:</h3>
+                <button id="btn-facil" class="btn-menu">Fácil (2x2)</button>
+                <button id="btn-medio" class="btn-menu">Médio (4x2)</button>
+                <button id="btn-dificil" class="btn-menu">Difícil (4x4)</button>
+                
+                <hr>
+                
+                <button id="btn-continuar" class="btn-menu" disabled>Continuar Jogo Salvo</button>
+                <button id="btn-ajuda" class="btn-menu">Ajuda / Instruções</button>
+                <button id="btn-creditos" class="btn-menu">Créditos</button>
+            </nav>
         </div>
 
-        <div id="game-status" class="visualmente-escondido" aria-live="polite">
+        <div id="tela-jogo" class="tela escondido">
+            <div class="controles-jogo">
+                <button id="btn-voltar-menu" class="btn-pequeno">Voltar ao Menu</button>
+                <button id="btn-reiniciar" class="btn-pequeno">Reiniciar Partida</button>
             </div>
+
+            <div id="game-board" role="grid" aria-label="Tabuleiro do Jogo"></div>
+        </div>
+
+        <div id="tela-modal" class="tela escondido" role="dialog" aria-modal="true">
+            <h2 id="modal-titulo">Título</h2>
+            <p id="modal-texto">Texto...</p>
+            <button id="btn-fechar-modal" class="btn-menu">Voltar</button>
+        </div>
+
+        <div id="game-status" class="visualmente-escondido" role="alert"></div>
     </main>
 
-    <script src="js/modeloJogo.js" defer></script>
-    <script src="js/visaoJogo.js" defer></script>
-    <script src="js/main.js" defer></script>
-
+    <script src="js/modeloJogo.js"></script>
+    <script src="js/visaoJogo.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>

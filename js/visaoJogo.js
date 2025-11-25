@@ -1,87 +1,77 @@
-
 const visaoJogo = {
-    tabuleiro: document.getElementById('game-board'),
+    tabuleiroDiv: document.getElementById('game-board'),
     statusAnuncio: document.getElementById('game-status'),
-    botoes: document.querySelectorAll('[role="gridcell"]'),
-    cacheDeAudio: {},
+    cacheAudio: {},
+    botoes: [],
 
-    preCarregarSons(nomesDosSons) {
-        console.log("Visão: Pré-carregando sons...");
-        nomesDosSons.forEach(nome => {
-            const audio = new Audio();
-            audio.src = `audio/${nome}.wav`;
-            this.cacheDeAudio[nome] = audio;
-        });
-        console.log("Visão: Sons prontos!", this.cacheDeAudio);
+    gerarTabuleiro(linhas, colunas, cartasJaEncontradas = []) {
+        this.tabuleiroDiv.innerHTML = '';
+        this.tabuleiroDiv.style.gridTemplateColumns = `repeat(${colunas}, 1fr)`;
+
+        const totalCartas = linhas * colunas;
+
+        for (let i = 0; i < totalCartas; i++) {
+            const btn = document.createElement('button');
+            btn.setAttribute('role', 'gridcell');
+            btn.dataset.indice = i; 
+            
+            const l = Math.floor(i / colunas) + 1;
+            const c = (i % colunas) + 1;
+            btn.setAttribute('aria-label', `Carta da linha ${l}, coluna ${c}`);
+
+            this.tabuleiroDiv.appendChild(btn);
+        }
+
+        this.botoes = document.querySelectorAll('[role="gridcell"]');
     },
 
-    tocarSom(nomeDoSom) {
-        console.log("VISÃO: Recebi ordem para tocar:", nomeDoSom);
+    preCarregarSons(nomes) {
+        nomes.forEach(nome => {
+            if(!this.cacheAudio[nome]) {
+                const audio = new Audio();
+                audio.src = `audio/${nome}.wav`; 
+                this.cacheAudio[nome] = audio;
+            }
+        });
+    },
 
-        const audio = this.cacheDeAudio[nomeDoSom];
-
+    tocarSom(nome) {
+        const audio = this.cacheAudio[nome];
         if (audio) {
-            audio.currentTime = 0; 
-            audio.play().catch(e => console.error("Erro ao tocar áudio:", e));
-        } else {
-            console.warn(`Visão: Som "${nomeDoSom}" não encontrado no cache!`);
+            audio.currentTime = 0;
+            audio.play();
         }
     },
 
     anunciarStatus(mensagem) {
-        this.statusAnuncio.textContent = mensagem;
-        console.log("Anúncio:", mensagem);
+        this.statusAnuncio.innerHTML = '';
+        setTimeout(() => {
+            const p = document.createElement('p');
+            p.innerText = mensagem;
+            this.statusAnuncio.appendChild(p);
+        }, 500); 
     },
 
-    travarCarta(indice) {
-        const botao = this.botoes[indice];
-        botao.classList.add('carta-travada');
-        
-        const linha = Math.floor(indice / 4) + 1;
-        const coluna = (indice % 4) + 1;
-        botao.setAttribute('aria-label', `Carta Posição ${linha},${coluna} - Selecionada`);
+    atualizarCarta(indice, tipo, nomeSom = '') {
+        const btn = this.botoes[indice];
+        if (!btn) return;
+
+        if (tipo === 'selecionada') {
+            btn.classList.add('carta-travada');
+        } else if (tipo === 'par') {
+            btn.classList.remove('carta-travada');
+            btn.classList.add('carta-par-encontrado');
+            btn.setAttribute('aria-disabled', 'true');
+            btn.setAttribute('aria-label', `${nomeSom} - Par Encontrado`);
+        } else if (tipo === 'reset') {
+            btn.classList.remove('carta-travada');
+            const colunas = window.getComputedStyle(this.tabuleiroDiv).gridTemplateColumns.split(' ').length;
+            const l = Math.floor(indice / colunas) + 1;
+            const c = (indice % colunas) + 1;
+            btn.setAttribute('aria-label', `Carta da linha ${l}, coluna ${c}`);
+        }
     },
-
-    travarPar(indice1, indice2, nomeDoSom) {
-        const botao1 = this.botoes[indice1];
-        const botao2 = this.botoes[indice2];
-
-        botao1.classList.remove('carta-travada');
-        botao2.classList.remove('carta-travada');
-        
-        botao1.classList.add('carta-par-encontrado');
-        botao2.classList.add('carta-par-encontrado');
-
-        botao1.setAttribute('aria-disabled', 'true');
-        botao2.setAttribute('aria-disabled', 'true');
-
-        const textoAcessivel = `${nomeDoSom} - Par encontrado`;
-        botao1.setAttribute('aria-label', textoAcessivel);
-        botao2.setAttribute('aria-label', textoAcessivel);
-    },
-
-    desvirarCartas(indice1, indice2) {
-        const botao1 = this.botoes[indice1];
-        const botao2 = this.botoes[indice2];
-
-        botao1.classList.remove('carta-travada');
-        botao2.classList.remove('carta-travada');
-
-        const recuperarNomeOriginal = (ind) => {
-            const linha = Math.floor(ind / 4) + 1;
-            const coluna = (ind % 4) + 1;
-            return `Carta Posição ${linha},${coluna}`;
-        };
-
-        botao1.setAttribute('aria-label', recuperarNomeOriginal(indice1));
-        botao2.setAttribute('aria-label', recuperarNomeOriginal(indice2));
-    },
-
-    inicializarCartas() {
-        this.botoes.forEach((botao, index) => {
-            const linha = Math.floor(index / 4) + 1;
-            const coluna = (index % 4) + 1;
-            botao.setAttribute('aria-label', `Carta Posição ${linha},${coluna}`);
-        });
-    },
+    
+    restaurarVisual(tabuleiroLogico) {
+    }
 };
