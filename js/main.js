@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     /**
-     * @param {number} indice
+     * TESTE
      */
     function lidarComSelecaoDeCarta(indice) {
         console.log("CLIQUE DETETADO! Índice:", indice);
